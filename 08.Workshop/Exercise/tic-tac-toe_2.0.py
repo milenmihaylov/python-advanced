@@ -1,0 +1,90 @@
+from math import ceil
+
+
+def set_up():
+    global player_one, player_two
+    player_one_name = input("Player one name: ")
+    player_two_name = input("Player two name: ")
+    player_one_symbol, player_two_symbol = choose_symbol(player_one_name)
+    player_one = player_one_name, player_one_symbol
+    player_two = player_two_name, player_two_symbol
+    print("This is the numeration of the board:")
+    print_board(initial_board)
+    print(f"{player_one_name} starts first!")
+
+
+def choose_symbol(player_1_name):
+    player_one_choice = input(f"{player_1_name} would you like to play with 'X' or 'O'? ")
+    if player_one_choice.upper() == 'X':
+        player_1_symbol, player_2_symbol = 'X', 'O'
+    elif player_one_choice.upper() == 'O':
+        player_1_symbol, player_2_symbol = 'O', 'X'
+
+    else:
+        print('The signs can only be "X" and "O"')
+        return choose_symbol(player_1_name)
+    return player_1_symbol, player_2_symbol
+
+
+def print_board(game_board):
+    [print('|  ' + '  |  '.join(x) + '  |') for x in game_board]
+
+
+def check_free_position(r, c):
+    if board[r][c] == ' ':
+        return True
+    print(f"Position {position} is not free!")
+    return False
+
+
+def check_int_in_range(position):
+    if not position.isdigit() or int(position) not in range(1, 10):
+        print("Please, enter an integer [1-9]!")
+        return False
+    return True
+
+
+def check_game_won(player, player_symbol):
+    first_row = all(x == player_symbol for x in board[0])
+    second_row = all(x == player_symbol for x in board[1])
+    third_row = all(x == player_symbol for x in board[2])
+    first_column = all(x == player_symbol for x in [board[0][0], board[1][0], board[2][0]])
+    second_column = all(x == player_symbol for x in [board[0][1], board[1][1], board[2][1]])
+    third_column = all(x == player_symbol for x in [board[0][2], board[1][2], board[2][2]])
+    first_diagonal = all(x == player_symbol for x in [board[0][0], board[1][1], board[2][2]])
+    second_diagonal = all(x == player_symbol for x in [board[0][2], board[1][1], board[2][0]])
+    if any([first_row, second_row, third_row, first_column, second_column, third_column,
+            first_diagonal, second_diagonal]):
+        print(f"{player} won!")
+        return True
+    return False
+
+
+player_one = None
+player_two = None
+
+initial_board = [
+    ['1', '2', '3'],
+    ['4', '5', '6'],
+    ['7', '8', '9']]
+board = [
+    [' ', ' ', ' '],
+    [' ', ' ', ' '],
+    [' ', ' ', ' ']]
+
+set_up()
+current, other = player_one, player_two
+while True:
+    position = input(f"{current[0]} choose a free position [1-9]: ")
+    if not check_int_in_range(position):
+        continue
+    position = int(position)
+    row = ceil(position / 3) - 1
+    col = position % 3 - 1
+    if not check_free_position(row, col):
+        continue
+    board[row][col] = current[1]
+    print_board(board)
+    if check_game_won(current[0], current[1]):
+        break
+    current, other = other, current
